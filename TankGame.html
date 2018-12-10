@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>坦克大战</title>
+</head>
+<style type="text/css">
+    *{margin: 0px;padding: 0px;}
+
+    #big_div{
+        width: 1200px;
+        height:600px;
+        border: 2px orange solid;
+        margin: 50px auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #tank{
+        width:60px;
+        height:60px;
+        position: absolute;
+        top:400px;
+        left:510px;
+        background: red;
+    }
+</style>
+<body>
+    <div id="big_div">
+        <div id="tank">
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="jquer/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    //存敌机数组
+    var enemyTanks = new Array();
+
+    //存子弹数组
+    var bullets = new Array();
+    //大盒子宽高
+    var big_div_width = $("#big_div").width();
+    var big_div_height = $("#big_div").height();
+
+    //坦克宽高
+    var tank_width = $("#tank").width();
+    var tank_height = $("#tank").height();
+    var tankOffset = 10;    //坦克偏移量
+
+    //监听键盘事件控制坦克移动和放子弹
+    $(document).keydown(function (e) {
+        var event  = e || window.event;
+        switch(e.keyCode){
+            case 87:            //top
+                animatetop();
+                break;
+            case 83:           //down
+                animatedown();
+                break;
+            case 65:           //left
+               animateleft();
+                break;
+            case 68:           //right
+                animateright();
+                break;
+            case 38:           //↑
+                animatetop();
+                break;
+            case 40:           //↓
+                animatedown();
+                break;
+            case 37:           //←
+               animateleft();
+                break;
+            case 39:           //→
+                animateright();
+                break;
+            case 74:           //j子弹
+                bullet("red",5,5);
+                break;
+            case 75:          //k子弹
+                bullet("blue",5,20);
+                break;
+            case 76:          //L子弹
+                bullet("#FF38D6",5,5);
+                bullet("#FF38D6",5,5);
+                bullet("#FF38D6",5,5);
+                break;
+        }
+
+    });
+
+    //向上移动
+    function animatetop() {
+        var top =  $("#tank").position().top;
+        if(top>0){
+            $("#tank").css({top:top-tankOffset});
+        }
+    }
+
+    //向下移动
+    function animatedown() {
+        var top = $("#tank").position().top;
+        if(top<$("#big_div").height()-$("#tank").height()){
+            $("#tank").css({top:top+tankOffset});
+        }
+    }
+
+    //向左移动
+    function animateleft() {
+        var left = $("#tank").position().left;
+        if(left>0){
+            $("#tank").css({left:left-tankOffset});
+        }
+    }
+
+    //向右移动
+    function animateright() {
+
+        var left = $("#tank").position().left;
+        if(left<$("#big_div").width()-$("#tank").width()){
+            $("#tank").css({left:left+tankOffset});
+        }
+
+    }
+
+   //子弹偏移值
+    var offsetBullet = 10;
+
+    //生成子弹方法
+    function bullet(color,width,height) {
+        var top =  $("#tank").position().top;
+        var left =  $("#tank").position().left;
+        var $bullet_div = $("<div class='bullet'></div>");
+        $bullet_div.css({width:width,height:height,background:color,position:"absolute",top:top-height,left:left+$("#tank").width()/2-width/2});
+        $("#big_div").append($bullet_div);
+
+        //将子弹对象存入数组
+        bullets[bullets.length] = $bullet_div;
+
+        //子弹移动
+        var timer = setInterval(function () {
+            var bullet_div_top = $($bullet_div).position().top;
+            var bullet_div_left = $($bullet_div).position().left;
+            $($bullet_div).css({top:bullet_div_top-offsetBullet});
+
+            //判断敌方是否存在
+            if(enemyTanks.length>0){
+                for(var i=0;i<enemyTanks.length;i++){
+                    var enemyX = $(enemyTanks[i]).position().left;
+                    var enemyY = $(enemyTanks[i]).position().top;
+
+                    if(bullet_div_top<enemyY+$(enemyTanks[i]).height()&&bullet_div_left>=enemyX&&bullet_div_left<enemyX+$(enemyTanks[i]).width()){
+                        $(enemyTanks[i]).remove();
+                        $($bullet_div).remove();
+                    }
+                }
+            }
+
+            //记得子弹碰到墙就移除元素
+            if(bullet_div_top<=-height){
+                $($bullet_div).remove();
+                clearInterval(timer);
+            }
+        },50);
+    }
+
+    var colors = ["red","yellow","blue","green","#AEFFD9","black","orange","#04FBFF","#FF8BFE","#8FB3FF"];
+    var count =0;
+
+    //三秒随机一个坦克
+    var createTankTimer = setInterval(showTank,3000);
+
+    //生成敌方坦克
+    function showTank() {
+        //随机颜色,宽高
+        var index = Math.floor(Math.random()*colors.length);
+        var width = Math.floor(Math.random()*25+40);//40~65
+        var height = Math.floor(Math.random()*25+40);
+        createTank(colors[index],width,height);
+        count++;
+        if(count>=3){
+            clearInterval(createTankTimer);
+            count=0;
+
+            //6秒后激活定时器
+            setTimeout(function () {
+                createTankTimer =setInterval(showTank,3000);
+            },6000);
+        }
+    }
+
+
+    function createTank(color,width,height){
+        //随机定位
+        var top = Math.floor(Math.random()*(big_div_height/2-tank_height));
+        var left = Math.floor(Math.random()*(big_div_width-tank_width));
+
+        var $enemyTank = $("<div class='enemyTank_div'></div>");
+
+        $enemyTank.css({
+            width:width,
+            height:height,
+            position:"absolute",
+            top:top,
+            left:left,
+            background:color
+        });
+        $("#big_div").append($enemyTank);
+
+        var timer = setInterval(function () {
+            var enemyTankY = $($enemyTank).position().top;
+
+            $($enemyTank).css({
+               top:enemyTankY+offsetBullet
+            });
+
+            if(enemyTankY>big_div_height){
+                $($enemyTank).remove();
+                clearInterval(timer);
+            }
+        },500);
+
+        //把敌机对象存入数组
+        enemyTanks[enemyTanks.length] = $enemyTank;
+    }
+</script>
+</html>
