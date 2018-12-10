@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<style type="text/css">
+    *{margin: 0;padding: 0;}
+
+    #big_div{
+        width: 823px;
+        height:603px;
+        margin: 50px auto;
+        /*border: 1px red solid;*/
+    }
+
+    #login{
+        width: 350px;
+        height:250px;
+        border: 1.5px red solid;
+        margin: 0 auto;
+        text-align: center;
+        position: fixed;
+        z-index: 2;
+        background-color: white;
+        top:230px;
+        left:450px;
+        display: none;
+    }
+    #badImg{
+        float: right;
+    }
+    #msg{
+        color:orange;
+        font-size: 25px;
+        font-family: "楷体";
+        margin-top: 55px;
+    }
+    #report{
+        font-size: 30px;
+        margin-top: 15px;
+        color: red;
+    }
+    #total_time{
+        font-size:16px;
+        margin-top: 8px;
+        color: #3057ff;
+    }
+    #skip{
+        width: 200px;
+        height: 50px;
+        /*border: 1px red solid;*/
+        margin: 0 auto;
+        margin-top: 25px;
+    }
+    #reg{
+        float: left;
+        color: #1beaff;
+        font-size: 20px;
+    }
+    #lon{
+        float: right;
+        color: #1beaff;
+        font-size: 20px;
+    }
+    #skip a{
+        text-decoration: none;
+    }
+
+    #skip a:hover {
+        color: orangered;
+    }
+
+    dl{
+        width: 600px;
+        height:450px;
+        float: left;
+    }
+    dt{
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+        float: left;}
+    dl img{
+        width: 150px;
+        height: 150px;
+    }
+    #dl_list div{
+        width: 150px;
+        height: 150px;
+        background: url("heart.jpg");
+        background-size: 100% 105%;
+        display: block;
+    }
+
+    #score{
+        width: 200px;
+        height:150px;
+        border:2px red solid;
+        float: left;
+        list-style: none;
+        margin-left: 10px;
+    }
+    li{
+        width: 200px;
+        height: 50px;
+        font-size: 20px;
+        text-align: center;
+        line-height: 50px;
+        border-bottom: 1px orange solid;
+    }
+</style>
+<body>
+    <div id="big_div">
+        <!--通关成功提示-->
+        <div id="login">
+            <img src="差号1.png" width="20" height="20" id="badImg" onmouseover="chgIg(this)" onmouseout="backIg(this)" onclick="none()">
+            <div id="msg">^_^恭喜通关成功^_^</div>
+            <p id="report">40分</p>
+            <p id="total_time">00:00:00</p>
+            <div id="skip"><a href="#" id="reg">退出</a><a href="#" id="lon" onclick="window.location.reload()">再玩一局</a></div>
+        </div>
+        <dl id="dl_list">
+            <dt><div></div><img src="thumbnail_staff2-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff3-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff4-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff7-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff8-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff9-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff9-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff8-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff7-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff4-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff3-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff2-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff7-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff3-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff7-hd.png" name="img"></dt>
+            <dt><div></div><img src="thumbnail_staff3-hd.png" name="img"></dt>
+        </dl>
+        <ul id="score">
+            <li>分数</li>
+            <li id="grade">0</li>
+            <li id="time" style="border: unset;">0:00</li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript">
+    var success = document.getElementById("login");
+    var report = document.getElementById("report");
+    var total_time = document.getElementById("total_time");
+    window.onload = function(){
+        //前面一句是禁止右键的，后面一句是禁止复制的
+        // document.oncontextmenu=function(){return false;};
+        document.onselectstart=function(){return false;};
+        var dl_list = document.getElementById("dl_list");
+        var grade = document.getElementById("grade");
+        var div = document.getElementsByTagName("div");
+        var time = document.getElementById("time");
+        var count=0;
+        var score=0;
+        var timer,timer1,timer2;
+        var object;
+        var target1=null;
+        var target2=null;
+        var img1=null;
+        var img2=null;
+        var clock=0;
+        var date;
+
+        var imgs = document.getElementsByName("img");
+        var img_src = ["thumbnail_staff2-hd.png","thumbnail_staff3-hd.png","thumbnail_staff4-hd.png","thumbnail_staff7-hd.png"
+        ,"thumbnail_staff8-hd.png","thumbnail_staff9-hd.png"];
+        var num = new Array();
+
+        //先把图片下标全部存入数组中然后在随机两个数存入数组中
+        for(var i=0;i<(imgs.length/2);i++){
+            if(i<img_src.length){
+                num[i] = i;
+            }
+            if(i>=img_src.length){
+                num[i] = Math.floor(Math.random()*img_src.length);
+            }
+        }
+
+        //将随机数的数组的值在复制一遍存入num数组
+        for(var i=imgs.length/2;i<imgs.length;i++){
+            num[i]=num[i-(imgs.length/2)];
+        }
+
+        //num数组的值打乱
+        var randomImg;
+        for(var i = 0; i < 100; i++){
+            var randomIndex = Math.floor(Math.random()*(num.length));
+            randomImg = num[randomIndex];
+            num.splice(randomIndex, 1);
+            num.push(randomImg);
+        }
+
+        //设置img图片
+        for(var i = 0; i < num.length; i++){
+            imgs[i].src = img_src[num[i]];
+        }
+
+        var clickCount=0;
+        dl_list.onclick = function (event){
+
+            //让点击击事件失效
+            dl_list.style="pointer-events: none";
+            //200毫秒后让点击击事件生效
+            setTimeout(function () {
+                dl_list.style="pointer-events: block";
+            },200);
+
+            clickCount++;
+            if(clickCount<=1){
+                timer=setInterval(function () {
+                    var currentDate = new Date();
+                    var year = currentDate.getFullYear();
+                    var month = currentDate.getMonth();
+                    var day = currentDate.getDate();
+                    date = new Date(year,month,day,0,0,0,clock);
+                    clock+=8;
+                    var mills = date.getMilliseconds();
+                    time.innerHTML=date.toTimeString().slice(0,8)+":"+mills;
+                },8);
+            }
+
+            var e = event||window.event;
+
+            //target是具体拿到被触发事件的元素
+            object = e.target || e.srcElement;
+            if(object.nodeName =="DIV"){
+                //遮掩图片消失
+                displayNone(object);
+                var divObject = object;
+                //判断第几次点击
+                if(target1==null){  //first
+                    //1.5秒让遮掩图片显示
+                    timer1 = setTimeout(function () {
+                        show(divObject);
+                        target1=null;
+                        target2=null;
+                    },1500);
+                    target1=object;
+                    img1= target1.parentNode.getElementsByTagName('img')[0];
+                }else{      //second
+                    target2=object;
+                    img2 = target2.parentNode.getElementsByTagName('img')[0];
+
+                    //两次的对象是不一致才进行比较
+                    if(target1!=target2||target2!=null){
+                        if(img1.src==img2.src){
+                            displayNone(target1);
+                            displayNone(target2);
+                            clearTimeout(timer1);
+                            count++;
+                            grade.innerHTML =(score+=10);
+                            target1=null;
+                            target2=null;
+                            if(count==(imgs.length)/2){
+                                clearInterval(timer);
+                                var hours = date.getHours();
+                                var minutes = date.getMinutes();
+                                var seconds = date.getSeconds();
+                                success.style.display="block";
+                                report.innerHTML = grade.textContent+"分";
+                                total_time.innerHTML = "共耗时"+hours+"小时"+minutes+"分"+seconds+"秒";
+                            }
+                        }else{
+                            grade.innerHTML =(score-=2);
+                            timer1=setTimeout(function () {
+                                show(target1);
+                                target1=null;
+                            },100);
+                            timer2 = setTimeout(function () {
+                                show(target2);
+                                target2=null;
+                            },100);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    //遮掩图片消失
+    function displayNone(obj){
+        obj.style.display="none";
+    }
+    //遮掩图片显示
+    function show(obj){
+        obj.style.display="block";
+    }
+
+    var imgUrls = ["差号1.png","差号2.png"];
+    var exit_btn = document.getElementById("reg");
+    var play_again_btn = document.getElementById("lon");
+    var bagImg = document.getElementById("badImg");
+
+
+    //设置按钮和图片不可被拖动
+    exit_btn.draggable = false;
+    play_again_btn.draggable = false;
+    bagImg.draggable = false;
+
+    success.onmousedown =function (ev) {
+        var click_event = ev || window.event;
+        //拿到点击的坐标值
+        var startX = click_event.clientX;
+        var startY = click_event.clientY;
+
+        //上下的偏移量
+        var leftOffset = startX-success.offsetLeft;
+        var topOffset = startY-success.offsetTop;
+
+        //鼠标移动事件
+        success.onmousemove = function (ev2) {
+            var move_event = ev2 || window.event;
+            var currentX = move_event.clientX;
+            var currentY = move_event.clientY;
+
+            success.style.left = currentX-leftOffset+"px";
+            success.style.top = currentY-topOffset+"px";
+
+            success.style.cursor="move";
+        }
+
+    };
+
+    success.onmouseup = function (ev) {
+        success.onmousemove = null;
+        success.style.cursor="default";
+    }
+    function chgIg(imgObj) {
+        imgObj.src=imgUrls[1];
+    }
+
+    function backIg(imgObj) {
+        imgObj.src=imgUrls[0];
+    }
+
+    function none() {
+        success.style.display = "none";
+    }
+</script>
+</html>

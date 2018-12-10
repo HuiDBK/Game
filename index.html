@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Large Single Game</title>
+</head>
+<link href="Css/animatedborder.css" type="text/css" rel="stylesheet">
+<style type="text/css">
+    *{
+        padding: 0;
+        margin: 0;
+    }
+
+    #big_div{
+        width: 600px;
+        height:500px;
+        margin:100px auto;
+        border: 1.5px orange solid;
+        text-align: center;
+    }
+    #big_div>h3{
+        font-size: 45px;
+        font-family: 楷体;
+        margin-top:100px;
+    }
+    #big_div a{
+        text-decoration: none;
+    }
+
+    #big_div>dl{
+        margin-top: 50px;
+    }
+    #big_div dt{
+        font-size: 30px;
+        font-family: 楷体;
+        margin-top: 20px;
+    }
+    a:hover{
+        color:orange;
+    }
+</style>
+<body>
+    <div id="big_div">
+        <h3>Large Single Game</h3>
+        <dl>
+            <dt><a href="贪吃蛇.html">贪吃蛇</a></dt>
+            <dt><a href="FindSame/happyGame.html">连连看</a></dt>
+            <dt><a href="#">坦克大战</a></dt>
+        </dl>
+    </div>
+</body>
+<script type="text/javascript" src="jquer/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="jquer/jquery.animatedborder.js"></script>
+<script type="text/javascript">
+    var big_div = document.getElementById("big_div");
+    var colors = ["red","yellow","blue","green","#AEFFD9","black","orange","#04FBFF","#FF8BFE","#8FB3FF"];
+    $(big_div).animatedBorder({size: 3, color:'orange'});
+    var timer1 = setInterval(chgBroderColor,200);
+    var timer2 = setInterval(chgGameName,500);
+
+    function chgGameName() {
+        var index = Math.floor(Math.random()*colors.length);
+        $("h3").css({color:colors[index]});
+    }
+    function chgBroderColor() {
+        var index = Math.floor(Math.random()*colors.length);
+        $(big_div).animatedBorder({size: 3,color:colors[index]});
+        big_div.style.borderColor=colors[index];
+    }
+</script>
+</html>
